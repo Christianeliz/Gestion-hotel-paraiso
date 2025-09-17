@@ -83,6 +83,20 @@ public class ReservacionDAO {
         }
     }
     
+    private Reservacion mapearResultSetSinRelaciones(ResultSet rs) throws SQLException {
+        return new Reservacion(
+            rs.getInt("id"),
+            rs.getInt("cliente_id"),
+            rs.getInt("habitacion_id"),
+            LocalDate.parse(rs.getString("fecha_check_in")),
+            LocalDate.parse(rs.getString("fecha_check_out")),
+            Reservacion.EstadoReservacion.valueOf(rs.getString("estado")),
+            rs.getBigDecimal("costo_total"),
+            rs.getString("observaciones"),
+            LocalDate.parse(rs.getString("fecha_reservacion"))
+        );
+    }
+    
     public List<Reservacion> listarTodas() throws SQLException {
         String sql = "SELECT * FROM reservaciones ORDER BY fecha_check_in DESC";
         List<Reservacion> reservaciones = new ArrayList<>();
@@ -92,7 +106,7 @@ public class ReservacionDAO {
              ResultSet rs = pstmt.executeQuery()) {
             
             while (rs.next()) {
-                reservaciones.add(mapearResultSet(rs));
+                reservaciones.add(mapearResultSetSinRelaciones(rs));
             }
         }
         
