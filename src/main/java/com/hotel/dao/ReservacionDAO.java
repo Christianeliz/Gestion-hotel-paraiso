@@ -39,7 +39,7 @@ public class ReservacionDAO {
         """;
         
         try (Connection conn = DatabaseConnection.getConnection();
-             PreparedStatement pstmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
             
             pstmt.setInt(1, reservacion.getClienteId());
             pstmt.setInt(2, reservacion.getHabitacionId());
@@ -53,7 +53,10 @@ public class ReservacionDAO {
             int filasAfectadas = pstmt.executeUpdate();
             
             if (filasAfectadas > 0) {
-                try (ResultSet rs = pstmt.getGeneratedKeys()) {
+                // Obtener el último ID insertado
+                String lastIdSql = "SELECT last_insert_rowid()";
+                try (PreparedStatement lastIdStmt = conn.prepareStatement(lastIdSql);
+                     ResultSet rs = lastIdStmt.executeQuery()) {
                     if (rs.next()) {
                         reservacion.setId(rs.getInt(1));
                     }
@@ -85,8 +88,8 @@ public class ReservacionDAO {
         List<Reservacion> reservaciones = new ArrayList<>();
         
         try (Connection conn = DatabaseConnection.getConnection();
-             Statement stmt = conn.createStatement();
-             ResultSet rs = stmt.executeQuery(sql)) {
+             PreparedStatement pstmt = conn.prepareStatement(sql);
+             ResultSet rs = pstmt.executeQuery()) {
             
             while (rs.next()) {
                 reservaciones.add(mapearResultSet(rs));

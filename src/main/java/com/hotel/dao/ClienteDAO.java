@@ -16,7 +16,7 @@ public class ClienteDAO {
         String sql = "INSERT INTO clientes (nombre, apellido, dni, telefono, email) VALUES (?, ?, ?, ?, ?)";
         
         try (Connection conn = DatabaseConnection.getConnection();
-             PreparedStatement pstmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
             
             pstmt.setString(1, cliente.getNombre());
             pstmt.setString(2, cliente.getApellido());
@@ -27,7 +27,10 @@ public class ClienteDAO {
             int filasAfectadas = pstmt.executeUpdate();
             
             if (filasAfectadas > 0) {
-                try (ResultSet rs = pstmt.getGeneratedKeys()) {
+                // Obtener el último ID insertado
+                String lastIdSql = "SELECT last_insert_rowid()";
+                try (PreparedStatement lastIdStmt = conn.prepareStatement(lastIdSql);
+                     ResultSet rs = lastIdStmt.executeQuery()) {
                     if (rs.next()) {
                         cliente.setId(rs.getInt(1));
                     }

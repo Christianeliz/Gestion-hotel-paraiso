@@ -1,0 +1,20 @@
+# Build artifacts
+target/
+*.class
+*.jar
+
+# Database files
+*.db
+*.sqlite
+
+# IDE files
+.idea/
+.eclipse/
+*.iml
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
